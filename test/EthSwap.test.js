@@ -1,5 +1,3 @@
-const { default: Web3 } = require('web3');
-
 const Token = artifacts.require("Token");
 const EthSwap = artifacts.require("EthSwap");
 
@@ -7,7 +5,7 @@ require('chai')
   .use(require('chai-as-promised'))
   .should()
 
-  contract('Token',(account) => {
+  contract('Token',(accounts) => {
   
     describe('Token deployment',async () => {
         it('contract has a name', async () => {
@@ -23,7 +21,7 @@ function tokens(n) {
  return web3.utils.toWei(n,'ether');
 }
 
-contract('EthSwap',(account) => {
+contract('EthSwap',([deployer,inverstor]) => {
     let token,ethSwap;
     before(async () => {
         token = await Token.new();
@@ -43,5 +41,18 @@ contract('EthSwap',(account) => {
             assert.equal(balance.toString(), tokens('1000000'))
         })
 
+    })
+    describe('buyTokens()',async () => {
+        
+        before(async () => {
+            let result;
+            result =  await ethSwap.buyTokens({from: inverstor, value: web3.utils.toWei('1','ether')});
+    
+        })
+
+        it('Allows user to instantly purchase tokens from ethSwap for a fixed price',async () => {
+          let inverstorBalance = await token.balanceOf(inverstor)
+          assert.equal(inverstorBalance.toString(), tokens('100'))
+        })
     })
 })
